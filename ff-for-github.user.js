@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Fast-forward merge for GitHub
 // @namespace    dunkirk.sh
-// @version      1.10
+// @version      1.12
 // @description  Adds fast-forward merging to GitHub's merge method dropdown and compare pages. Based on simnalamburt/ff-for-github.
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @author       Kieran Klukas, simnalamburt
@@ -431,19 +431,44 @@
 		if (!repoInfo.permissions?.push) return HIDDEN;
 		if (pr.state !== "open" || pr.draft) return HIDDEN;
 
-		const cmp = await api(
-			"GET",
-			`/repos/${enc(owner)}/${enc(repo)}/compare/${enc(pr.base.ref)}...${pr.head.sha}`,
+		const stack = await findStackBelow(owner, repo, pr);
+		const bases = stack.map((p) => p.base.ref).reverse();
+		const cmps = await Promise.all(
+			bases.map((base) =>
+				api(
+					"GET",
+					`/repos/${enc(owner)}/${enc(repo)}/compare/${enc(base)}...${pr.head.sha}`,
+				),
+			),
 		);
+		const blocking = cmps.findIndex((cmp) => cmp.status !== "ahead");
+		const cmp = cmps[blocking === -1 ? 0 : blocking];
 		return {
 			kind: "ready",
 			status: cmp.status,
-			aheadBy: cmp.ahead_by ?? 0,
+			aheadBy: cmps[0].ahead_by ?? 0,
 			behindBy: cmp.behind_by ?? 0,
-			base: pr.base.ref,
+			base: bases[0],
+			blockingBase: bases[blocking === -1 ? 0 : blocking],
+			bases,
+			stackSize: stack.length,
+			pulls: stack.map((p) => p.number).reverse(),
 			head: pr.head.ref,
 			headSha: pr.head.sha,
 		};
+	}
+
+	async function findStackBelow(owner, repo, pr) {
+		if (!pr.stack?.number || !(pr.stack.position > 1)) return [pr];
+		const stack = await api(
+			"GET",
+			`/repos/${enc(owner)}/${enc(repo)}/stacks/${pr.stack.number}`,
+		);
+		const members = stack.pull_requests ?? [];
+		const index = members.findIndex((p) => p.number === pr.number);
+		if (index < 1 || members.slice(0, index).some((p) => p.state !== "open"))
+			return [pr];
+		return members.slice(0, index + 1).reverse();
 	}
 
 	async function fetchCompareStatus({ owner, repo, base, head }) {
@@ -665,12 +690,14 @@
 		current.mergeError = null;
 		schedule();
 		try {
-			await fastForward(
-				current.route.owner,
-				current.route.repo,
-				result.base,
-				result.headSha,
-			);
+			for (const base of result.bases ?? [result.base]) {
+				await fastForward(
+					current.route.owner,
+					current.route.repo,
+					base,
+					result.headSha,
+				);
+			}
 			current.mergedSha = result.headSha;
 		} catch (err) {
 			current.mergeError = err.message;
@@ -725,7 +752,9 @@
       font-size: 85%;
     }
     [data-ghff] .commit-link:hover,
-    [data-a11y-link-underlines="true"] [data-ghff] .commit-link {
+    [data-ghff] .issue-link:hover,
+    [data-a11y-link-underlines="true"] [data-ghff] .commit-link,
+    [data-a11y-link-underlines="true"] [data-ghff] .issue-link {
       text-decoration: underline;
       text-underline-offset: 0.2rem;
     }
@@ -771,10 +800,29 @@
 		el.ghffKey = key;
 		el.replaceChildren(
 			...text.map((part) =>
-				typeof part === "string" ? part : commitLink(part.sha),
+				typeof part === "string"
+					? part
+					: part.pr
+						? pullLink(part.pr)
+						: commitLink(part.sha),
 			),
 		);
 	};
+
+	function pullLink(number) {
+		const { owner, repo } = page.route;
+		return h(
+			"a",
+			{
+				class: "issue-link js-issue-link",
+				href: `https://github.com/${owner}/${repo}/pull/${number}`,
+				"data-url": `https://github.com/${owner}/${repo}/issues/${number}`,
+				"data-hovercard-type": "pull_request",
+				"data-hovercard-url": `/${owner}/${repo}/pull/${number}/hovercard`,
+			},
+			`#${number}`,
+		);
+	}
 
 	function commitLink(sha) {
 		const { owner, repo } = page.route;
@@ -872,17 +920,25 @@
 		if (result.kind === "error")
 			return result.quiet ? null : { desc: result.message, disabled: true };
 		if (result.kind !== "ready") return null;
+		const stacked = result.stackSize > 1;
 		if (result.status === "ahead") {
 			const commits =
 				result.aheadBy === 1 ? "The 1 commit" : `The ${result.aheadBy} commits`;
+			const from = stacked
+				? `these ${result.stackSize} branches`
+				: "this branch";
 			return {
-				desc: `${commits} from this branch will be added to the base branch unchanged.`,
+				desc: `${commits} from ${from} will be added to the base branch unchanged.`,
 				disabled: false,
 			};
 		}
 		if (result.status === "diverged") {
+			const who =
+				stacked && result.blockingBase !== result.base
+					? result.blockingBase
+					: "The base branch";
 			return {
-				desc: `The base branch has ${plural(result.behindBy, "commit")} that ${result.behindBy === 1 ? "isn't" : "aren't"} in this branch.`,
+				desc: `${who} has ${plural(result.behindBy, "commit")} that ${result.behindBy === 1 ? "isn't" : "aren't"} in this branch.`,
 				disabled: true,
 			};
 		}
@@ -969,7 +1025,10 @@
 		}
 	}
 
-	function cloneButton(native, { variant, extraClass = "", onClick }) {
+	function cloneButton(
+		native,
+		{ variant, extraClass = "", onClick, keepCount = false },
+	) {
 		const button = native.cloneNode(true);
 		for (const attr of [
 			"id",
@@ -990,6 +1049,13 @@
 		button.setAttribute("data-variant", variant);
 		button.setAttribute("data-loading", "false");
 		button.setAttribute("aria-disabled", "false");
+		for (const visual of button.querySelectorAll(
+			"[data-component='leadingVisual'], [data-component='trailingVisual']",
+		))
+			if (!keepCount || !visual.querySelector("[data-component='ButtonCounter']"))
+				visual.remove();
+		if (!button.querySelector("[data-component='trailingVisual']"))
+			button.removeAttribute("data-has-count");
 		const label = button.querySelector("[data-component='text']");
 		if (label) label.textContent = "";
 		else button.append(h("span", { "data-component": "text" }));
@@ -1020,6 +1086,7 @@
 		const button = cloneButton(nativeButton, {
 			variant: nativeButton.getAttribute("data-variant") || "primary",
 			extraClass: "flex-1",
+			keepCount: true,
 			onClick: () => {
 				if (!page) return;
 				page.confirming = true;
@@ -1126,6 +1193,7 @@
 			),
 		);
 		const bypassing = !!bypassBox?.checked && !blocked;
+		const stacked = page.result?.stackSize > 1;
 
 		if (active && !showPanel) {
 			if (!ui.mainItem || !ui.mainItem.root.isConnected) {
@@ -1135,10 +1203,18 @@
 			placeBefore(ui.mainItem.root, nativeItem);
 			hideNative(nativeItem, true);
 			const pending = !page.result;
+			const counter = ui.mainItem.button.querySelector(
+				"[data-component='trailingVisual']",
+			);
+			if (counter) setHidden(counter, !stacked);
 			setButtonState(ui.mainItem.button, {
-				text: bypassing
-					? "Bypass rules and fast-forward"
-					: "Fast-forward merge",
+				text: stacked
+					? bypassing
+						? "Bypass rules and fast-forward stack"
+						: "Fast-forward stack"
+					: bypassing
+						? "Bypass rules and fast-forward"
+						: "Fast-forward merge",
 				disabled: blocked || pending,
 				title: pending ? "Checking…" : blockedTitle,
 			});
@@ -1165,28 +1241,37 @@
 				hideNative(child, child !== panel.root);
 
 			const { result, merging, mergeError, mergedSha } = page;
-			const base = result?.base ?? "the base branch";
+			const prs = result?.pulls?.length > 1 ? result.pulls : null;
+			const target = prs
+				? [
+						`${prs.length} pull requests (`,
+						{ pr: prs[0] },
+						"–",
+						{ pr: prs[prs.length - 1] },
+						")",
+					]
+				: [result?.base ?? "the base branch"];
 			let text;
-			if (mergedSha) text = [`Fast-forwarded ${base} to `, { sha: mergedSha }];
+			if (mergedSha)
+				text = ["Fast-forwarded ", ...target, " to ", { sha: mergedSha }];
 			else if (mergeError) text = mergeError;
 			else if (merging)
-				text = [`Fast-forwarding ${base} to `, { sha: result.headSha }, "…"];
+				text = ["Fast-forwarding ", ...target, " to ", { sha: result.headSha }, "…"];
 			else
-				text = [`This will fast-forward ${base} to `, { sha: result.headSha }];
+				text = ["This will fast-forward ", ...target, " to ", { sha: result.headSha }];
 			setText(panel.text, text);
 			panel.text.classList.toggle("fgColor-danger", !!mergeError && !mergedSha);
 			panel.text.classList.toggle("fgColor-muted", !mergeError || !!mergedSha);
 
-			setHidden(panel.confirm, !!mergedSha);
-			setHidden(panel.cancel, !!mergedSha);
+			setHidden(panel.confirm.parentElement, !!mergedSha);
 			setButtonState(panel.confirm, {
 				text: merging
 					? "Fast-forwarding…"
 					: mergeError
 						? "Try again"
 						: bypassing
-							? "Confirm bypass rules and fast-forward"
-							: "Confirm fast-forward",
+							? `Confirm bypass rules and fast-forward${stacked ? " stack" : ""}`
+							: `Confirm fast-forward${stacked ? " stack" : ""}`,
 				disabled: merging || blocked,
 				title: blockedTitle,
 			});
