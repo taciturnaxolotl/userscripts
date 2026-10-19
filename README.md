@@ -8,6 +8,7 @@ The canonical repo for this is hosted on tangled over at [`https://tangled.org/d
 
 Install a userscript manager like [Tampermonkey](https://www.tampermonkey.net/) and then click any of the following links:
 
+- [Amazon URL Cleaner](https://tangled.org/dunkirk.sh/userscripts/raw/main/clean-amazon-urls.user.js)
 - [Canvas Multi-File Upload](https://tangled.org/dunkirk.sh/userscripts/raw/main/canvas-multi-upload.user.js)
 - [Claude Counter](https://tangled.org/dunkirk.sh/userscripts/raw/main/claude-counter.user.js)
 - [Fast-forward merge for GitHub](https://tangled.org/dunkirk.sh/userscripts/raw/main/ff-for-github.user.js)
