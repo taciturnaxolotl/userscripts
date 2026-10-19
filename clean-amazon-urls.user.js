@@ -1,11 +1,14 @@
 // ==UserScript==
 // @name         Amazon URL Cleaner
-// @namespace    https://tangled.sh/@dunkirk.sh/bunplayground/amazon-shortener
-// @version      0.2
+// @namespace    dunkirk.sh
+// @version      0.3
+// @description  Removes fluff from Amazon URLs to get clean product links
+// @author       Kieran Klukas
+// @license      MIT
+// @homepageURL  https://tangled.org/dunkirk.sh/userscripts
+// @supportURL   https://tangled.org/dunkirk.sh/userscripts/issues
 // @updateURL    https://tangled.org/dunkirk.sh/userscripts/raw/main/clean-amazon-urls.user.js
 // @downloadURL  https://tangled.org/dunkirk.sh/userscripts/raw/main/clean-amazon-urls.user.js
-// @description  Removes fluff from Amazon URLs to get clean product links
-// @author       You
 // @match        https://www.amazon.com/*
 // @grant        none
 // @run-at       document-start

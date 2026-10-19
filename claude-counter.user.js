@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Claude Counter
-// @namespace    https://github.com/she-llac/claude-counter
-// @version      2.1.1-userscript
+// @namespace    dunkirk.sh
+// @version      2.1.2-userscript
+// @description  Shows token count, cache timer, and usage bars on claude.ai. Merged build: hey-naf v2.0.2 fixes ported onto the Rohx24 userscript port.
+// @author       Kieran Klukas, she-llac, hey-naf, Rohx24
+// @license      MIT
+// @homepageURL  https://tangled.org/dunkirk.sh/userscripts
+// @supportURL   https://tangled.org/dunkirk.sh/userscripts/issues
 // @updateURL    https://tangled.org/dunkirk.sh/userscripts/raw/main/claude-counter.user.js
 // @downloadURL  https://tangled.org/dunkirk.sh/userscripts/raw/main/claude-counter.user.js
-// @description  Shows token count, cache timer, and usage bars on claude.ai. Merged build: hey-naf v2.0.2 fixes ported onto the Rohx24 userscript port.
-// @author       she-llac, hey-naf, Rohx24
-// @license      MIT
 // @match        https://claude.ai/*
 // @run-at       document-start
 // @grant        none

@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         zyBooks auto play animations
-// @version      0.3
+// @namespace    dunkirk.sh
+// @version      0.4
+// @description  One click to speed up the boring parts
+// @author       Kieran Klukas, Evanito
+// @homepageURL  https://tangled.org/dunkirk.sh/userscripts
+// @supportURL   https://tangled.org/dunkirk.sh/userscripts/issues
 // @updateURL    https://tangled.org/dunkirk.sh/userscripts/raw/main/zybooks-autoplay.user.js
 // @downloadURL  https://tangled.org/dunkirk.sh/userscripts/raw/main/zybooks-autoplay.user.js
-// @description  One click to speed up the boring parts
-// @author       Evanito
 // @match        https://learn.zybooks.com/zybook/*
-// @namespace https://github.com/Evanito/zyBAuto
-// @run-at document-idle
+// @run-at       document-idle
 // ==/UserScript==
 // TO USE: Click Autocomplete! on a zyBooks page <-----
 

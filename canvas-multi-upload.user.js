@@ -1,10 +1,14 @@
 // ==UserScript==
 // @name         Canvas Multi-File Upload
 // @namespace    dunkirk.sh
-// @version      1.6
+// @version      1.7
+// @description  Pick or drop several files at once on a Canvas assignment submission; each one lands in its own upload row, and empty rows never appear.
+// @author       Kieran Klukas
+// @license      MIT
+// @homepageURL  https://tangled.org/dunkirk.sh/userscripts
+// @supportURL   https://tangled.org/dunkirk.sh/userscripts/issues
 // @updateURL    https://tangled.org/dunkirk.sh/userscripts/raw/main/canvas-multi-upload.user.js
 // @downloadURL  https://tangled.org/dunkirk.sh/userscripts/raw/main/canvas-multi-upload.user.js
-// @description  Pick or drop several files at once on a Canvas assignment submission; each one lands in its own upload row, and empty rows never appear.
 // @match        https://*.instructure.com/courses/*/assignments/*
 // @run-at       document-start
 // @grant        none
