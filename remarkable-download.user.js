@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         reMarkable Download & Print
 // @namespace    dunkirk.sh
-// @version      1.1
+// @version      1.2
+// @updateURL    https://tangled.org/dunkirk.sh/userscripts/raw/main/remarkable-download.user.js
+// @downloadURL  https://tangled.org/dunkirk.sh/userscripts/raw/main/remarkable-download.user.js
 // @description  Adds Download PDF and Print to the reMarkable web app, stitching the app's own rendered pages into a lossless PDF.
 // @match        https://app.remarkable.com/*
 // @run-at       document-idle

@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         Fast-forward merge for GitHub
 // @namespace    dunkirk.sh
-// @version      1.6
+// @version      1.7
+// @updateURL    https://tangled.org/dunkirk.sh/userscripts/raw/main/ff-for-github.user.js
+// @downloadURL  https://tangled.org/dunkirk.sh/userscripts/raw/main/ff-for-github.user.js
 // @description  Adds fast-forward merging to GitHub's merge method dropdown and compare pages. Based on simnalamburt/ff-for-github.
 // @license      MIT OR Apache-2.0
 // @match        https://github.com/*
