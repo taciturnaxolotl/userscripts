@@ -1,6 +1,6 @@
-# userscripts
+# Kieran's fancy userscripts
 
-kieran's fancy userscripts
+This is my personal collection of userscripts that do fun things to the web a wee bit more palatible :)
 
 The canonical repo for this is hosted on tangled over at [`https://tangled.org/dunkirk.sh/userscripts`](https://tangled.org/dunkirk.sh/userscripts)
 
