@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         reMarkable Download & Print
 // @namespace    dunkirk.sh
-// @version      1.3
+// @version      1.4
 // @description  Adds Download PDF and Print to the reMarkable web app, stitching the app's own rendered pages into a lossless PDF.
+// @icon         https://remarkable.com/favicons/favicon-32x32.png
 // @author       Kieran Klukas
 // @license      MIT
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts

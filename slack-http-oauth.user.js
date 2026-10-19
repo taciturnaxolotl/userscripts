@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Slack Allow HTTP OAuth URLs
 // @namespace    dunkirk.sh
-// @version      0.3
+// @version      0.4
 // @description  Allow http:// redirect URLs in Slack OAuth settings
+// @icon         https://a.slack-edge.com/80588/marketing/img/meta/favicon-32.png
 // @author       Kieran Klukas
 // @license      MIT
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts

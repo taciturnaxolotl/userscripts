@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         YouTube Auto Resolution
 // @namespace    dunkirk.sh
-// @version      2.0
+// @version      2.1
 // @description  Picks the highest available video quality (or a cap you set) on every YouTube video, including ones you navigate to without a reload. Adapted from zackton's version
+// @icon         https://www.youtube.com/favicon.ico
 // @author       Kieran Klukas, zackton
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts
 // @supportURL   https://tangled.org/dunkirk.sh/userscripts/issues

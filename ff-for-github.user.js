@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Fast-forward merge for GitHub
 // @namespace    dunkirk.sh
-// @version      1.8
+// @version      1.9
 // @description  Adds fast-forward merging to GitHub's merge method dropdown and compare pages. Based on simnalamburt/ff-for-github.
+// @icon         https://github.githubassets.com/favicons/favicon.png
 // @author       Kieran Klukas, simnalamburt
 // @license      MIT OR Apache-2.0
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts

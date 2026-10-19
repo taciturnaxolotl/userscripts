@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Amazon URL Cleaner
 // @namespace    dunkirk.sh
-// @version      0.3
+// @version      0.4
 // @description  Removes fluff from Amazon URLs to get clean product links
+// @icon         https://www.amazon.com/favicon.ico
 // @author       Kieran Klukas
 // @license      MIT
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts

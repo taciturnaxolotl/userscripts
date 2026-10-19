@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Claude Counter
 // @namespace    dunkirk.sh
-// @version      2.1.2-userscript
+// @version      2.1.3-userscript
 // @description  Shows token count, cache timer, and usage bars on claude.ai. Merged build: hey-naf v2.0.2 fixes ported onto the Rohx24 userscript port.
+// @icon         https://claude.ai/favicon.ico
 // @author       Kieran Klukas, she-llac, hey-naf, Rohx24
 // @license      MIT
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts

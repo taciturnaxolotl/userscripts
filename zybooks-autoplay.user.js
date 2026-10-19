@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         zyBooks auto play animations
 // @namespace    dunkirk.sh
-// @version      0.4
+// @version      0.5
 // @description  One click to speed up the boring parts
+// @icon         https://learn.zybooks.com/assets/favicon.ico
 // @author       Kieran Klukas, Evanito
 // @homepageURL  https://tangled.org/dunkirk.sh/userscripts
 // @supportURL   https://tangled.org/dunkirk.sh/userscripts/issues
