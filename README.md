@@ -13,6 +13,7 @@ Install a userscript manager like [Tampermonkey](https://www.tampermonkey.net/) 
 - [Claude Counter](https://tangled.org/dunkirk.sh/userscripts/raw/main/claude-counter.user.js)
 - [Fast-forward merge for GitHub](https://tangled.org/dunkirk.sh/userscripts/raw/main/ff-for-github.user.js)
 - [reMarkable Download & Print](https://tangled.org/dunkirk.sh/userscripts/raw/main/remarkable-download.user.js)
+- [Slack Allow HTTP OAuth URLs](https://tangled.org/dunkirk.sh/userscripts/raw/main/slack-http-oauth.user.js)
 - [YouTube Auto Resolution](https://tangled.org/dunkirk.sh/userscripts/raw/main/youtube-auto-resolution.user.js)
 - [zyBooks auto play animations](https://tangled.org/dunkirk.sh/userscripts/raw/main/zybooks-autoplay.user.js)
 
