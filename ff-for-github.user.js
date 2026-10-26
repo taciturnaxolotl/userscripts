@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Fast-forward merge for GitHub
 // @namespace    dunkirk.sh
-// @version      1.12
+// @version      1.13
 // @description  Adds fast-forward merging to GitHub's merge method dropdown and compare pages. Based on simnalamburt/ff-for-github.
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @author       Kieran Klukas, simnalamburt
@@ -752,9 +752,7 @@
       font-size: 85%;
     }
     [data-ghff] .commit-link:hover,
-    [data-ghff] .issue-link:hover,
-    [data-a11y-link-underlines="true"] [data-ghff] .commit-link,
-    [data-a11y-link-underlines="true"] [data-ghff] .issue-link {
+    [data-a11y-link-underlines="true"] [data-ghff] .commit-link {
       text-decoration: underline;
       text-underline-offset: 0.2rem;
     }
@@ -800,29 +798,10 @@
 		el.ghffKey = key;
 		el.replaceChildren(
 			...text.map((part) =>
-				typeof part === "string"
-					? part
-					: part.pr
-						? pullLink(part.pr)
-						: commitLink(part.sha),
+				typeof part === "string" ? part : commitLink(part.sha),
 			),
 		);
 	};
-
-	function pullLink(number) {
-		const { owner, repo } = page.route;
-		return h(
-			"a",
-			{
-				class: "issue-link js-issue-link",
-				href: `https://github.com/${owner}/${repo}/pull/${number}`,
-				"data-url": `https://github.com/${owner}/${repo}/issues/${number}`,
-				"data-hovercard-type": "pull_request",
-				"data-hovercard-url": `/${owner}/${repo}/pull/${number}/hovercard`,
-			},
-			`#${number}`,
-		);
-	}
 
 	function commitLink(sha) {
 		const { owner, repo } = page.route;
@@ -1243,20 +1222,14 @@
 			const { result, merging, mergeError, mergedSha } = page;
 			const prs = result?.pulls?.length > 1 ? result.pulls : null;
 			const target = prs
-				? [
-						`${prs.length} pull requests (`,
-						{ pr: prs[0] },
-						"–",
-						{ pr: prs[prs.length - 1] },
-						")",
-					]
+				? [`${prs.length} pull requests`]
 				: [result?.base ?? "the base branch"];
 			let text;
 			if (mergedSha)
 				text = ["Fast-forwarded ", ...target, " to ", { sha: mergedSha }];
 			else if (mergeError) text = mergeError;
 			else if (merging)
-				text = ["Fast-forwarding ", ...target, " to ", { sha: result.headSha }, "…"];
+				text = ["Fast-forwarding ", ...target, " to ", { sha: result.headSha }];
 			else
 				text = ["This will fast-forward ", ...target, " to ", { sha: result.headSha }];
 			setText(panel.text, text);
@@ -1266,7 +1239,7 @@
 			setHidden(panel.confirm.parentElement, !!mergedSha);
 			setButtonState(panel.confirm, {
 				text: merging
-					? "Fast-forwarding…"
+					? "Fast-forwarding"
 					: mergeError
 						? "Try again"
 						: bypassing
@@ -1312,7 +1285,7 @@
 					`${result.base} can be fast-forwarded to ${result.head}.`,
 				error: !!mergeError,
 				action: merging
-					? "Fast-forwarding…"
+					? "Fast-forwarding"
 					: confirming
 						? `Confirm fast-forward`
 						: `Fast-forward ${result.base}`,
