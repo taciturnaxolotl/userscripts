@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Fast-forward merge for GitHub
 // @namespace    dunkirk.sh
-// @version      1.13
+// @version      1.14
 // @description  Adds fast-forward merging to GitHub's merge method dropdown and compare pages. Based on simnalamburt/ff-for-github.
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @author       Kieran Klukas, simnalamburt
@@ -858,11 +858,8 @@
 	}
 
 	function closeMethodMenu() {
-		document
-			.querySelector(
-				`${MERGEBOX} [data-component='ButtonGroup'] button[aria-haspopup][aria-expanded='true']`,
-			)
-			?.click();
+		const toggle = mergeControls(document)?.toggle;
+		if (toggle?.getAttribute("aria-expanded") === "true") toggle.click();
 	}
 
 	function onMenuItem(event) {
@@ -1116,11 +1113,22 @@
 		return { root, text, confirm, cancel };
 	}
 
-	function nativeMergeButton(container) {
-		const group = container.querySelector("[data-component='ButtonGroup']");
-		return [...(group?.querySelectorAll("button") ?? [])].find(
+	const accessibleName = (el) =>
+		el.getAttribute("aria-label") ||
+		document.getElementById(el.getAttribute("aria-labelledby"))?.textContent ||
+		"";
+
+	function mergeControls(container) {
+		const toggle = [
+			...container.querySelectorAll(
+				"[data-component='ButtonGroup'] button[aria-haspopup]",
+			),
+		].find((b) => /merge method/i.test(accessibleName(b)));
+		const group = toggle?.closest("[data-component='ButtonGroup']");
+		const button = [...(group?.querySelectorAll("button") ?? [])].find(
 			(b) => !b.closest("[data-ghff]") && !b.hasAttribute("aria-haspopup"),
 		);
+		return button ? { button, toggle } : null;
 	}
 
 	function pullFingerprint(container) {
@@ -1151,12 +1159,9 @@
 
 		reconcileMenu();
 
-		const nativeButton = nativeMergeButton(container);
+		const { button: nativeButton } = mergeControls(container) ?? {};
 		const nativeItem = nativeButton?.parentElement;
-		const row = nativeButton?.closest(
-			"[data-component='ButtonGroup']",
-		)?.parentElement;
-		const active = !!row && ffActive();
+		const active = !!nativeButton && ffActive();
 		const showPanel = active && page.confirming;
 
 		const blocked =
