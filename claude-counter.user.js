@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Claude Counter
 // @namespace    dunkirk.sh
-// @version      2.1.4-userscript
+// @version      2.1.5-userscript
 // @description  Shows token count, cache timer, and usage bars on claude.ai. Merged build: hey-naf v2.0.2 fixes ported onto the Rohx24 userscript port.
 // @icon         https://claude.ai/favicon.ico
 // @author       Kieran Klukas, she-llac, hey-naf, Rohx24
@@ -1463,9 +1463,21 @@
 		ui.setConversationMetrics({ totalTokens: metrics.totalTokens, cachedUntil: metrics.cachedUntil });
 	}
 
+	let reconcileTimer = null;
+	function scheduleUsageReconcile(delayMs) {
+		if (reconcileTimer) clearTimeout(reconcileTimer);
+		reconcileTimer = setTimeout(() => {
+			reconcileTimer = null;
+			refreshUsage();
+		}, delayMs);
+	}
+
 	function handleMessageLimit(messageLimit) {
 		const parsed = parseUsageFromMessageLimit(messageLimit);
 		applyUsageUpdate(parsed, 'sse');
+		// The stream's windows can lag or describe a scoped limit; the usage
+		// endpoint is authoritative when it reports anything.
+		scheduleUsageReconcile(3000);
 	}
 
 	async function handleUrlChange() {
@@ -1487,9 +1499,14 @@
 		// Usage is org-level: restore/refresh on every page, including home/new
 		updateOrgIdIfNeeded(await getOrgId());
 		if (!usageState) {
+			// Cache is only a placeholder so bars don't flash empty; always
+			// reconcile with the endpoint so a stale snapshot can't stick.
 			const cached = restoreCachedUsage();
-			if (cached) applyUsageUpdate(cached, 'cache');
-			else await refreshUsage();
+			if (cached) {
+				applyUsageUpdate(cached, 'cache');
+				lastUsageUpdateMs = 0;
+			}
+			await refreshUsage();
 		}
 
 		if (!currentConversationId) {
